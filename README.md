@@ -1,4 +1,16 @@
 eventsim
+
+```
+docker build -t eventsim .
+```
+
+```
+docker run -it \
+  -v "$(pwd)"/data:/opt/eventsim/data -v "$(pwd)"/examples:/opt/eventsim/examples \
+  eventsim \
+    -c "examples/example-config.json" --from 365 --nusers 30000 --growth-rate 0.30 data/fake.json
+```
+
 ========
 
 Eventsim is a program that generates event data for testing and demos. It's written in Scala, because we are
@@ -111,13 +123,13 @@ To build the executable, run
 
     $ sbt assembly
     $ # make sure the script is executable
-    $ chmod +x bin/eventsim
+    $ chmod +x eventsim.sh
 
 (By the way, eventsim requires Java 8.)
 
 The program can accept a number of command line options:
 
-    $ bin/eventsim --help
+    $ eventsim.sh --help
         -a, --attrition-rate  <arg>    annual user attrition rate (as a fraction of
                                        current, so 1% => 0.01) (default = 0.0)
         -c, --config  <arg>            config file
@@ -155,7 +167,7 @@ everything.
 
 Example for about 2.5 M events (1000 users for a year, growing at 1% annually):
 
-    $ bin/eventsim -c "examples/site.json" --from 365 --nusers 1000 --growth-rate 0.01 data/fake.json
+    $ ./eventsim.sh -c "examples/site.json" --from 365 --nusers 1000 --growth-rate 0.01 data/fake.json
     Initial number of users: 1000, Final number of users: 1010
     Starting to generate events.
     Damping=0.0625, Weekend-Damping=0.5
@@ -163,7 +175,7 @@ Example for about 2.5 M events (1000 users for a year, growing at 1% annually):
 
 Example for more events (30,000 users for a year, growing at 30% annually):
 
-    $ bin/eventsim -c "examples/site.json" --from 365 --nusers 30000 --growth-rate 0.30 data/fake.json
+    $ ./eventsim.sh -c "examples/site.json" --from 365 --nusers 30000 --growth-rate 0.30 data/fake.json
 
 Building huge data sets in parallel
 ===================================
@@ -181,11 +193,15 @@ and end dates; you will find some incomplete data between files.
 A Cool Example
 ==============
 
+```
+chmod +x eventsim.sh
+```
+
 To simulate A/B tests, create multiple data sets for the same time period with different sets of member ids, different
 tags, and different  parameters for alpha, beta, transition probabilities, or growth rates. For example, you can
 geneate two files of about 5000 users with different characteristics with two commands like this:
 
-        $ bin/eventsim --config examples/example-config.json --tag control -n 5000 \
+        $ ./eventsim.sh --config examples/example-config.json --tag control -n 5000 \
         --start-time "2015-06-01T00:00:00" --end-time "2015-09-01T00:00:00" \
         --growth-rate 0.25 --userid 1 --randomseed 1 control.data.json
         Loading song file...
@@ -199,7 +215,7 @@ geneate two files of about 5000 users with different characteristics with two co
         Damping=0.09375, Weekend-Damping=0.5
         Now: 2015-08-31T15:38:02, Events:1430000, Rate: 147058 eps
 
-        $bin/eventsim --config examples/alt-example-config.json --tag test -n 5000 \
+        $ ./eventsim.sh --config examples/alt-example-config.json --tag test -n 5000 \
         > --start-time "2015-06-01T00:00:00" --end-time "2015-09-01T00:00:00" \
         > --growth-rate 0.25 --userid 5336 --randomseed 2 test.data.json
         Loading song file...
@@ -275,4 +291,4 @@ To build the executable, run
 
     $ sbt assembly
     $ # make sure the script is executable
-    $ chmod +x bin/eventsim
+    $ chmod +x ./eventsim.sh
